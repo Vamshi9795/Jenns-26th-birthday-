@@ -10,7 +10,8 @@
 <style>
   /* ================================================================
      CONFIG — search for "CONFIG" in the <script> at the bottom to
-     personalize names, photos, the captcha answer, and your video.
+     personalize names, photos, the captcha answer, your song, and
+     both videos (the joke "birth video" and the real surprise video).
      ================================================================ */
 
   :root{
@@ -47,7 +48,6 @@
     position: relative;
   }
 
-  /* subtle repeating watermark texture using the cat-bow motif */
   #watermark{
     position: fixed; inset: 0; z-index: 0;
     opacity: 0.05;
@@ -247,10 +247,8 @@
   .captcha-note.error{ color: #b23a3a; font-weight: 600; }
   .captcha-note.success{ color: #3d7a4d; font-weight: 600; }
 
-  /* ---------- final gift scene: both buttons say Yes ---------- */
   .yes-row{ display:flex; gap:14px; justify-content:center; }
 
-  /* ---------- video scene ---------- */
   video{
     width: 100%;
     border-radius: var(--radius-sm);
@@ -319,18 +317,19 @@
       <h1 class="md display">Noooooo Baby, It's Your Birthdayyyyyy.</h1>
       <p class="sub">Yayyyy It's Your Birthday</p>
       <div class="btn-row">
-        <button onclick="showBirthday('bahahhaha its your birthday')">How could your forgettttt ?</button>
+        <button onclick="showBirthday('bahahhaha its your birthday')">How could you forgettttt?</button>
       </div>
     </div>
   </section>
 
-  <!-- SCENE: birthday reveal -->
+  <!-- SCENE: birthday reveal — stays up for the full length of the song -->
   <section class="scene" data-scene="birthday">
     <div class="card">
       <div class="eyebrow">Confirmed</div>
       <h1 class="lg display">Happy Birthday.</h1>
       <p class="sub" id="birthdayLine">It's the time of the year my gfs special dayyyy</p>
-      <div class="btn-row">
+      <p class="sub" id="birthdaySongNote" style="margin-top:-16px; font-size:0.85rem;">🎶 sit back and enjoy this for a sec...</p>
+      <div class="btn-row" id="birthdayNextWrap" style="display:none;">
         <button onclick="goToScene('giftIntro')">What's next?</button>
       </div>
     </div>
@@ -340,7 +339,7 @@
   <section class="scene" data-scene="giftIntro">
     <div class="card">
       <div class="eyebrow">One moment</div>
-      <h1 class="md display">DO you wanna know what gifts I git for you ?</h1>
+      <h1 class="md display">Do you wanna know what gifts I got for you?</h1>
       <p class="sub">Choose carefully.</p>
       <div class="btn-row">
         <button onclick="goToScene('captcha')">Yes</button>
@@ -353,7 +352,7 @@
   <section class="scene" data-scene="captcha">
     <div class="card">
       <div class="eyebrow">Quick verification</div>
-      <h1 class="md display">Just for Identification Purposes can you please find your Boyfriend</h1>
+      <h1 class="md display">Just for identification purposes, can you please find your boyfriend</h1>
       <p class="sub">Select the 3 correct photos to continue.</p>
       <div class="captcha-grid" id="captchaGrid"></div>
       <div class="captcha-note" id="captchaNote">&nbsp;</div>
@@ -370,13 +369,28 @@
       <h1 class="md display">Do you want your final gift?</h1>
       <p class="sub">Pick an option.</p>
       <div class="yes-row">
-        <button onclick="goToScene('video')">Yes</button>
-        <button class="blue" onclick="goToScene('video')">Yes</button>
+        <button onclick="goToScene('birthVideo')">Yes</button>
+        <button class="blue" onclick="goToScene('birthVideo')">Yes</button>
       </div>
     </div>
   </section>
 
-  <!-- SCENE: video -->
+  <!-- SCENE: joke "birth video" — plays before the real surprise -->
+  <section class="scene" data-scene="birthVideo">
+    <div class="card">
+      <div class="eyebrow">Hold on</div>
+      <h1 class="md display">Wait... I actually found a video of how you were born</h1>
+      <video id="birthVideoEl" controls playsinline>
+        <source src="birth-video.mp4" type="video/mp4">
+        Your browser doesn't support video playback.
+      </video>
+      <div class="btn-row">
+        <button onclick="goToScene('video')">Okay, now show me the real gift</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: video (the real surprise) -->
   <section class="scene" data-scene="video">
     <div class="card">
       <div class="eyebrow">For you</div>
@@ -385,13 +399,13 @@
         <source src="video.mp4" type="video/mp4">
         Your browser doesn't support video playback.
       </video>
-      <div class="signoff">Your Boyfriend That loves you with all His Heart Vamshi Chakrala</div>
+      <div class="signoff">Your boyfriend, who loves you with all his heart — Vamshi Chakrala</div>
     </div>
   </section>
 
 </div>
 
-<audio id="backgroundSong" preload="auto" loop>
+<audio id="backgroundSong" preload="auto">
   <source src="song.mp3" type="audio/mpeg">
 </audio>
 
@@ -403,7 +417,6 @@
     // 9 photos for the "find your boyfriend" verification.
     // Mark exactly 3 as correct:true (photos of him). The other 6
     // are decoys — anything else (friends, strangers, objects, etc).
-    // Leave img:"" to show a camera placeholder until you add files.
     captchaPhotos: [
       { img: "", correct: false },
       { img: "", correct: true  },
@@ -415,11 +428,18 @@
       { img: "", correct: false },
       { img: "", correct: false }
     ],
-    videoSrc: "video.mp4", // your video file, placed next to this html file
-    songSrc: "song.mp3"    // the song to play the moment it's revealed to be her birthday
+    songSrc: "song.mp3",              // plays the moment it's revealed to be her birthday
+    birthVideoSrc: "birthvideo.mp4", // the joke video shown BEFORE the real surprise
+    videoSrc: "video.mp4",            // the real surprise video, shown last
+
+    // Safety fallback: if the song's exact length can't be detected
+    // (e.g. it fails to load), the "What's next?" button will reveal
+    // itself after this many milliseconds no matter what.
+    songFallbackMs: 32000
   };
 
   document.getElementById('birthdayVideo').querySelector('source').src = CONFIG.videoSrc;
+  document.getElementById('birthVideoEl').querySelector('source').src = CONFIG.birthVideoSrc;
   document.getElementById('backgroundSong').querySelector('source').src = CONFIG.songSrc;
 
   // ================================================================
@@ -437,18 +457,55 @@
     }
   }
 
-  function showBirthday(message){
-    document.getElementById('birthdayLine').textContent = message;
-    goToScene('birthday');
-    burstConfetti(130);
-    const song = document.getElementById('backgroundSong');
-    song.currentTime = 0;
-    song.play().catch(() => {});
-  }
-
   document.getElementById('guessInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleGuess();
   });
+
+  let songFallbackTimer = null;
+
+  function showBirthday(message){
+    document.getElementById('birthdayLine').textContent = message;
+    document.getElementById('birthdaySongNote').style.display = 'block';
+    document.getElementById('birthdayNextWrap').style.display = 'none';
+
+    goToScene('birthday');
+    burstConfetti(130);
+    startFloaters();
+    startBirthdayConfettiLoop();
+
+    const song = document.getElementById('backgroundSong');
+    song.currentTime = 0;
+
+    // Reveal the "What's next?" button once the song actually finishes.
+    song.onended = revealBirthdayNext;
+
+    song.play().catch(() => {
+      // If autoplay is blocked, don't trap her on this screen forever —
+      // fall back to the timer below instead.
+    });
+
+    // Safety net in case the song can't load or 'ended' never fires.
+    clearTimeout(songFallbackTimer);
+    songFallbackTimer = setTimeout(revealBirthdayNext, CONFIG.songFallbackMs);
+  }
+
+  function revealBirthdayNext(){
+    clearTimeout(songFallbackTimer);
+    document.getElementById('birthdaySongNote').style.display = 'none';
+    document.getElementById('birthdayNextWrap').style.display = 'flex';
+    stopBirthdayConfettiLoop();
+  }
+
+  // Keep confetti + balloons going the whole time the song plays,
+  // not just a single burst.
+  let birthdayConfettiTimer = null;
+  function startBirthdayConfettiLoop(){
+    if (birthdayConfettiTimer) return;
+    birthdayConfettiTimer = setInterval(() => burstConfetti(55), 1400);
+  }
+  function stopBirthdayConfettiLoop(){
+    if (birthdayConfettiTimer){ clearInterval(birthdayConfettiTimer); birthdayConfettiTimer = null; }
+  }
 
   // ================================================================
   // Captcha grid
@@ -527,17 +584,35 @@
       stopFloaters();
     }
 
+    // The song only ever plays during the birthday scene. Leaving it
+    // for any reason stops the song, full stop.
+    if (name !== 'birthday'){
+      const song = document.getElementById('backgroundSong');
+      song.onended = null;
+      song.pause();
+      stopBirthdayConfettiLoop();
+      clearTimeout(songFallbackTimer);
+    }
+
+    if (name === 'birthVideo'){
+      const bv = document.getElementById('birthVideoEl');
+      bv.currentTime = 0;
+      bv.play().catch(() => {});
+    } else {
+      document.getElementById('birthVideoEl').pause();
+    }
+
     if (name === 'video'){
-      document.getElementById('backgroundSong').pause();
       const v = document.getElementById('birthdayVideo');
       v.currentTime = 0;
       v.play().catch(() => {});
+    } else {
+      document.getElementById('birthdayVideo').pause();
     }
   }
 
   // ================================================================
-  // Floating balloons + bow-cats — big, playful, ambient during the
-  // birthday reveal and as a burst when she finds her boyfriend
+  // Floating balloons + bow-cats
   // ================================================================
   const floatersEl = document.getElementById('floaters');
   let floaterTimer = null;
@@ -583,7 +658,7 @@
   }
 
   // ================================================================
-  // Confetti — restrained palette, single orchestrated bursts only
+  // Confetti
   // ================================================================
   const canvas = document.getElementById('confetti-canvas');
   const ctx = canvas.getContext('2d');
