@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Surprise For You 🎀</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIG NOTE (also see CONFIG object at bottom of <script>):
+     - Change names in CONFIG.girlfriendName / CONFIG.boyfriendName
+     - Drop your own photos next to this file and update
+       CONFIG.photoOptions / CONFIG.boyfriendPhoto
+     - Drop your video file next to this file and update
+       CONFIG.videoSrc
+     ============================================================ */
+
+  :root{
+    --bg-a: #ffeaf4;
+    --bg-b: #ece1ff;
+    --ink: #3d2145;
+    --rose: #ff5c8a;
+    --rose-dark: #e8447a;
+    --gold: #ffc857;
+    --mint: #8fe3c0;
+    --card: #fffaf9;
+    --shadow: 0 20px 45px rgba(120, 40, 80, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--ink);
+    background: radial-gradient(circle at 20% 10%, var(--bg-a), var(--bg-b) 70%);
+    position: relative;
+  }
+
+  .display {
+    font-family: 'Pacifico', cursive;
+    font-weight: 400;
+  }
+
+  #confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+  }
+
+  #floaters {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .floater {
+    position: absolute;
+    bottom: -60px;
+    font-size: 2.2rem;
+    animation: floatUp linear forwards;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-115vh) rotate(8deg); opacity: 0; }
+  }
+
+  #app {
+    position: relative;
+    z-index: 10;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .scene {
+    display: none;
+    width: 100%;
+    max-width: 560px;
+    text-align: center;
+    animation: sceneIn 0.6s ease;
+  }
+
+  .scene.active { display: block; }
+
+  @keyframes sceneIn {
+    from { opacity: 0; transform: translateY(18px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 28px;
+    padding: 44px 32px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 92, 138, 0.15);
+  }
+
+  .eyebrow {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--rose-dark);
+    opacity: 0.75;
+    margin-bottom: 14px;
+  }
+
+  h1.title {
+    font-size: 2.4rem;
+    margin: 0 0 10px;
+    color: var(--rose-dark);
+  }
+
+  h1.big-title {
+    font-size: 3.1rem;
+    margin: 6px 0 14px;
+    color: var(--rose-dark);
+    line-height: 1.15;
+  }
+
+  p.sub {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    margin: 0 0 26px;
+    color: var(--ink);
+    opacity: 0.85;
+  }
+
+  input#guessInput {
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 16px;
+    border: 2px solid rgba(255, 92, 138, 0.25);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    margin-bottom: 18px;
+    transition: border-color 0.2s ease;
+  }
+
+  input#guessInput:focus { border-color: var(--rose); }
+
+  button {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    border: none;
+    border-radius: 999px;
+    padding: 15px 34px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
+    color: white;
+    box-shadow: 0 10px 24px rgba(255, 92, 138, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  button:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(255, 92, 138, 0.45); }
+  button:active { transform: translateY(0); }
+
+  button.ghost {
+    background: transparent;
+    color: var(--rose-dark);
+    box-shadow: none;
+    border: 2px solid rgba(255, 92, 138, 0.35);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cat-row {
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+
+  /* Photo match grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .photo-card {
+    background: linear-gradient(135deg, #fff, #fff0f5);
+    border: 2px solid rgba(255, 92, 138, 0.2);
+    border-radius: 20px;
+    padding: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .photo-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 14px 26px rgba(255,92,138,0.25); }
+
+  .photo-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ffd6e6, #e6d6ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+  .photo-label { font-weight: 700; font-size: 0.95rem; color: var(--rose-dark); }
+
+  /* Match reveal overlay */
+  #matchOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(61, 33, 69, 0.55);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #matchOverlay.active { display: flex; }
+
+  .match-card {
+    background: var(--card);
+    border-radius: 26px;
+    padding: 38px 30px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+    animation: popIn 0.4s cubic-bezier(.2,1.4,.4,1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .match-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    background: linear-gradient(135deg, var(--rose), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.2rem;
+    overflow: hidden;
+    border: 5px solid #fff;
+    box-shadow: 0 10px 24px rgba(255,92,138,0.35);
+  }
+
+  .match-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .match-percent {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--rose-dark);
+    margin: 6px 0 4px;
+  }
+
+  video {
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    background: #000;
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    opacity: 0.55;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 480px) {
+    h1.big-title { font-size: 2.3rem; }
+    .card { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="floaters"></div>
+
+<div id="app">
+
+  <!-- SCENE 1: Welcome -->
+  <section class="scene active" data-scene="1">
+    <div class="card">
+      <div class="eyebrow">Psst... come here</div>
+      <h1 class="title display">Welcome 💌</h1>
+      <p class="sub">Guess what day it is today...</p>
+      <input id="guessInput" type="text" placeholder="Type your guess here">
+      <div class="btn-row">
+        <button onclick="goToScene(2)">Submit my guess</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2: Birthday reveal -->
+  <section class="scene" data-scene="2">
+    <div class="card">
+      <div class="cat-row">🐱🎀 &nbsp; 🐱🎀 &nbsp; 🐱🎀</div>
+      <h1 class="big-title display">IT'S YOUR BIRTHDAY!! 🎉</h1>
+      <p class="sub" id="birthdaySub">Wrong, right, or "I don't know" — doesn't matter. Today is officially, 100%, all about you.</p>
+      <div class="btn-row">
+        <button onclick="goToScene(3)">Okay okay, what's next?</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3: Gift teaser -->
+  <section class="scene" data-scene="3">
+    <div class="card">
+      <div class="eyebrow">One more thing</div>
+      <h1 class="title display">Do you want to know your gift? 🎁</h1>
+      <p class="sub">Choose wisely.</p>
+      <div class="btn-row">
+        <button onclick="goToScene(4)">Yes</button>
+        <button class="ghost" onclick="goToScene(4)">No</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 4: Find your boyfriend -->
+  <section class="scene" data-scene="4">
+    <div class="card">
+      <div class="eyebrow">Match Time</div>
+      <h1 class="title display">Find your boyfriend 🔎💕</h1>
+      <p class="sub">Tap any photo below.</p>
+      <div class="grid" id="photoGrid"></div>
+      <p class="hint">(spoiler: they're all correct)</p>
+    </div>
+  </section>
+
+  <!-- SCENE 5: Video -->
+  <section class="scene" data-scene="5">
+    <div class="card">
+      <div class="eyebrow">Last surprise</div>
+      <h1 class="title display">This one's for you 🎬</h1>
+      <p class="sub">Happy birthday, my love.</p>
+      <video id="birthdayVideo" controls playsinline>
+        <source src="video.mp4" type="video/mp4">
+        Your browser doesn't support video playback.
+      </video>
+    </div>
+  </section>
+
+</div>
+
+<!-- Match overlay -->
+<div id="matchOverlay">
+  <div class="match-card">
+    <div class="match-photo" id="matchPhoto">💘</div>
+    <div class="match-percent">100% Match!</div>
+    <div id="matchName" style="font-weight:700; font-size:1.2rem; margin-bottom:18px;"></div>
+    <button onclick="closeMatch()">See my surprise ➜</button>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // CONFIG — edit this section to personalize everything
+  // ============================================================
+  const CONFIG = {
+    boyfriendName: "Your Boyfriend",     // shown on the match reveal
+    // Photo grid: put your own image filenames here (same folder as this html).
+    // Leave as emoji placeholders if you don't have files ready yet.
+    photoOptions: [
+      { label: "Option A", img: "" },
+      { label: "Option B", img: "" },
+      { label: "Option C", img: "" },
+      { label: "Option D", img: "" }
+    ],
+    boyfriendPhoto: "",   // e.g. "me.jpg" — shown in the match circle
+    videoSrc: "video.mp4" // your uploaded video file, same folder as this html
+  };
+
+  // Wire up video source from config
+  document.getElementById('birthdayVideo').querySelector('source').src = CONFIG.videoSrc;
+
+  // Build the photo grid
+  const grid = document.getElementById('photoGrid');
+  CONFIG.photoOptions.forEach((opt) => {
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    card.innerHTML = `
+      <div class="photo-frame">${opt.img ? `<img src="${opt.img}" alt="${opt.label}">` : '📷'}</div>
+      <div class="photo-label">${opt.label}</div>
+    `;
+    card.onclick = showMatch;
+    grid.appendChild(card);
+  });
+
+  function showMatch() {
+    const photoEl = document.getElementById('matchPhoto');
+    photoEl.innerHTML = CONFIG.boyfriendPhoto
+      ? `<img src="${CONFIG.boyfriendPhoto}" alt="${CONFIG.boyfriendName}">`
+      : '💘';
+    document.getElementById('matchName').textContent = `It's ${CONFIG.boyfriendName}!`;
+    document.getElementById('matchOverlay').classList.add('active');
+    burstConfetti(60);
+  }
+
+  function closeMatch() {
+    document.getElementById('matchOverlay').classList.remove('active');
+    goToScene(5);
+  }
+
+  // ============================================================
+  // Scene navigation
+  // ============================================================
+  function goToScene(n) {
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.scene[data-scene="${n}"]`).classList.add('active');
+
+    if (n === 2) {
+      burstConfetti(140);
+      startFloaters();
+    }
+    if (n === 5) {
+      stopFloaters();
+      const v = document.getElementById('birthdayVideo');
+      v.currentTime = 0;
+      v.play().catch(() => {}); // autoplay may be blocked until user interacts, that's fine
+    }
+  }
+
+  // ============================================================
+  // Confetti (lightweight canvas particle system)
+  // ============================================================
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  let particles = [];
+  const confettiColors = ['#ff5c8a', '#ffc857', '#8fe3c0', '#e6d6ff', '#ff9fc0'];
+
+  function burstConfetti(count) {
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 200,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 10,
+        color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+        vy: 2 + Math.random() * 3,
+        vx: -1.5 + Math.random() * 3,
+        rot: Math.random() * 360,
+        vr: -6 + Math.random() * 12,
+        life: 0
+      });
+    }
+    if (!animating) { animating = true; requestAnimationFrame(tick); }
+  }
+
+  let animating = false;
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    particles = particles.filter(p => p.y < canvas.height + 40 && p.life < 500);
+    if (particles.length > 0) {
+      requestAnimationFrame(tick);
+    } else {
+      animating = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  // ============================================================
+  // Floating cats-with-bows + hearts + balloons ambience
+  // ============================================================
+  const floaterEmojis = ['🐱🎀', '🎈', '💗', '🐈‍⬛🎀', '✨', '🎂'];
+  let floaterInterval = null;
+
+  function startFloaters() {
+    if (floaterInterval) return;
+    floaterInterval = setInterval(() => {
+      const el = document.createElement('div');
+      el.className = 'floater';
+      el.textContent = floaterEmojis[Math.floor(Math.random() * floaterEmojis.length)];
+      el.style.left = Math.random() * 90 + 'vw';
+      const duration = 6 + Math.random() * 5;
+      el.style.animationDuration = duration + 's';
+      el.style.fontSize = (1.6 + Math.random() * 1.6) + 'rem';
+      document.getElementById('floaters').appendChild(el);
+      setTimeout(() => el.remove(), duration * 1000 + 200);
+    }, 350);
+  }
+
+  function stopFloaters() {
+    if (floaterInterval) { clearInterval(floaterInterval); floaterInterval = null; }
+  }
+
+  // Allow Enter key to submit the guess
+  document.getElementById('guessInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') goToScene(2);
+  });
+</script>
+
+</body>
+</html>
