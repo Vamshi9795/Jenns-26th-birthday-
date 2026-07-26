@@ -381,7 +381,7 @@
       <div class="eyebrow">Hold on</div>
       <h1 class="md display">Wait... I actually found a video of how you were born</h1>
       <video id="birthVideoEl" controls playsinline>
-        <source src="birth-video.mp4" type="video/mp4">
+        <source src="birthvideo.mp4" type="video/mp4">
         Your browser doesn't support video playback.
       </video>
       <div class="btn-row">
@@ -429,7 +429,7 @@
       { img: "", correct: false }
     ],
     songSrc: "song.mp3",              // plays the moment it's revealed to be her birthday
-    birthVideoSrc: "birthvideo.mp4", // the joke video shown BEFORE the real surprise
+    birthVideoSrc: "birth-video.mp4", // the joke video shown BEFORE the real surprise
     videoSrc: "video.mp4",            // the real surprise video, shown last
 
     // Safety fallback: if the song's exact length can't be detected
@@ -441,6 +441,12 @@
   document.getElementById('birthdayVideo').querySelector('source').src = CONFIG.videoSrc;
   document.getElementById('birthVideoEl').querySelector('source').src = CONFIG.birthVideoSrc;
   document.getElementById('backgroundSong').querySelector('source').src = CONFIG.songSrc;
+
+  // Without calling .load(), some browsers keep using the source that
+  // was present when the page first parsed, ignoring the src change above.
+  document.getElementById('birthdayVideo').load();
+  document.getElementById('birthVideoEl').load();
+  document.getElementById('backgroundSong').load();
 
   // ================================================================
   // Scene 1 logic: guess the day
