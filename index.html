@@ -3,492 +3,622 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A Little Surprise For You 🎀</title>
+<title>An Invitation, For You</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
-  /* ============================================================
-     CONFIG NOTE (also see CONFIG object at bottom of <script>):
-     - Change names in CONFIG.girlfriendName / CONFIG.boyfriendName
-     - Drop your own photos next to this file and update
-       CONFIG.photoOptions / CONFIG.boyfriendPhoto
-     - Drop your video file next to this file and update
-       CONFIG.videoSrc
-     ============================================================ */
+  /* ================================================================
+     CONFIG — search for "CONFIG" in the <script> at the bottom to
+     personalize names, photos, the captcha answer, and your video.
+     ================================================================ */
 
   :root{
-    --bg-a: #ffeaf4;
-    --bg-b: #ece1ff;
-    --ink: #3d2145;
-    --rose: #ff5c8a;
-    --rose-dark: #e8447a;
-    --gold: #ffc857;
-    --mint: #8fe3c0;
-    --card: #fffaf9;
-    --shadow: 0 20px 45px rgba(120, 40, 80, 0.18);
+    --ink:        #241220;
+    --ink-2:      #3a1f38;
+    --paper:      #fff6ee;
+    --paper-2:    #fbe9dd;
+    --rose:       #c94f5f;
+    --rose-deep:  #a8394a;
+    --gold:       #c99a4b;
+    --gold-soft:  #e8cf9c;
+    --blue:       #2f4bd6;
+    --ink-soft:   rgba(36,18,32,0.68);
+    --line:       rgba(201,154,75,0.35);
+    --radius-lg:  26px;
+    --radius-sm:  14px;
+    --shadow:     0 30px 60px -20px rgba(20,8,18,0.55);
   }
 
-  * { box-sizing: border-box; }
+  *{ box-sizing: border-box; }
 
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
+  html, body{
+    margin:0; padding:0; height:100%;
+    overflow:hidden;
   }
 
-  body {
-    font-family: 'Quicksand', sans-serif;
-    color: var(--ink);
-    background: radial-gradient(circle at 20% 10%, var(--bg-a), var(--bg-b) 70%);
+  body{
+    font-family:'Inter', sans-serif;
+    color: var(--paper);
+    background:
+      radial-gradient(circle at 15% 0%, var(--ink-2), transparent 55%),
+      radial-gradient(circle at 85% 100%, var(--ink-2), transparent 55%),
+      var(--ink);
     position: relative;
   }
 
-  .display {
-    font-family: 'Pacifico', cursive;
-    font-weight: 400;
-  }
-
-  #confetti-canvas {
-    position: fixed;
-    inset: 0;
+  /* subtle repeating watermark texture using the cat-bow motif */
+  #watermark{
+    position: fixed; inset: 0; z-index: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><g fill='none' stroke='%23e8cf9c' stroke-width='1.4'><circle cx='60' cy='66' r='22'/><path d='M40 50 L48 30 L54 46 Z'/><path d='M80 50 L72 30 L66 46 Z'/><circle cx='52' cy='64' r='1.6' fill='%23e8cf9c'/><circle cx='68' cy='64' r='1.6' fill='%23e8cf9c'/><path d='M46 78 L74 78'/><path d='M60 14 L52 8 L60 4 L68 8 Z'/><circle cx='60' cy='9' r='2' fill='%23e8cf9c'/></g></svg>");
+    background-size: 120px 120px;
     pointer-events: none;
-    z-index: 40;
   }
 
-  #floaters {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5;
-    overflow: hidden;
+  .display{ font-family:'Fraunces', serif; }
+  .script{ font-family:'Caveat', cursive; }
+
+  #confetti-canvas{
+    position: fixed; inset: 0; pointer-events: none; z-index: 40;
   }
 
-  .floater {
+  #floaters{
+    position: fixed; inset: 0; pointer-events: none; z-index: 6; overflow: hidden;
+  }
+
+  .floater{
     position: absolute;
-    bottom: -60px;
-    font-size: 2.2rem;
+    bottom: -80px;
     animation: floatUp linear forwards;
-    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.25));
+  }
+  .floater.emoji{ font-size: 3rem; }
+  .floater svg{ width: 46px; height: 46px; }
+
+  @keyframes floatUp{
+    0%   { transform: translateX(0) translateY(0) rotate(-6deg); opacity: 0; }
+    8%   { opacity: 1; }
+    50%  { transform: translateX(24px) translateY(-55vh) rotate(6deg); }
+    92%  { opacity: 1; }
+    100% { transform: translateX(-10px) translateY(-118vh) rotate(-4deg); opacity: 0; }
   }
 
-  @keyframes floatUp {
-    0% { transform: translateY(0) rotate(-8deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-115vh) rotate(8deg); opacity: 0; }
+  #app{
+    position: relative; z-index: 10;
+    height: 100vh; width: 100vw;
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px;
   }
 
-  #app {
-    position: relative;
-    z-index: 10;
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-
-  .scene {
-    display: none;
+  .scene{
+    display:none;
     width: 100%;
-    max-width: 560px;
-    text-align: center;
-    animation: sceneIn 0.6s ease;
+    max-width: 480px;
+    animation: sceneIn 0.55s cubic-bezier(.2,.8,.2,1);
+  }
+  .scene.active{ display:block; }
+
+  @keyframes sceneIn{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
   }
 
-  .scene.active { display: block; }
-
-  @keyframes sceneIn {
-    from { opacity: 0; transform: translateY(18px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
-  .card {
-    background: var(--card);
-    border-radius: 28px;
-    padding: 44px 32px;
+  .card{
+    background: linear-gradient(160deg, var(--paper), var(--paper-2));
+    color: var(--ink);
+    border-radius: var(--radius-lg);
+    padding: 46px 38px;
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255, 92, 138, 0.15);
+    border: 1px solid var(--line);
+    text-align: center;
+    position: relative;
   }
 
-  .eyebrow {
-    letter-spacing: 3px;
+  .emblem{
+    width: 52px; height: 52px;
+    margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 1px solid var(--line);
+  }
+  .emblem svg{ width: 30px; height: 30px; }
+
+  .eyebrow{
     text-transform: uppercase;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: var(--rose-dark);
-    opacity: 0.75;
-    margin-bottom: 14px;
+    letter-spacing: 2.6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--rose-deep);
+    opacity: 0.85;
+    margin-bottom: 10px;
   }
 
-  h1.title {
-    font-size: 2.4rem;
-    margin: 0 0 10px;
-    color: var(--rose-dark);
-  }
-
-  h1.big-title {
-    font-size: 3.1rem;
-    margin: 6px 0 14px;
-    color: var(--rose-dark);
+  h1{
+    font-weight: 500;
+    margin: 0 0 12px;
+    color: var(--ink);
     line-height: 1.15;
   }
+  h1.md{ font-size: 1.9rem; }
+  h1.lg{ font-size: 2.5rem; }
 
-  p.sub {
-    font-size: 1.05rem;
-    line-height: 1.5;
-    margin: 0 0 26px;
-    color: var(--ink);
-    opacity: 0.85;
+  p.sub{
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 0 0 28px;
   }
 
-  input#guessInput {
+  hr.rule{
+    border: none;
+    border-top: 1px solid var(--line);
+    width: 60px;
+    margin: 0 auto 22px;
+  }
+
+  input#guessInput{
     width: 100%;
-    padding: 16px 18px;
-    border-radius: 16px;
-    border: 2px solid rgba(255, 92, 138, 0.25);
-    font-family: 'Quicksand', sans-serif;
-    font-size: 1.05rem;
-    font-weight: 600;
+    padding: 15px 18px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    background: #fffdfb;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
     color: var(--ink);
-    background: #fff;
     outline: none;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     transition: border-color 0.2s ease;
   }
+  input#guessInput:focus{ border-color: var(--rose); }
 
-  input#guessInput:focus { border-color: var(--rose); }
-
-  button {
-    font-family: 'Quicksand', sans-serif;
-    font-weight: 700;
-    font-size: 1.02rem;
-    border: none;
+  button{
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.2px;
     border-radius: 999px;
-    padding: 15px 34px;
+    padding: 14px 30px;
     cursor: pointer;
-    background: linear-gradient(135deg, var(--rose), var(--rose-dark));
-    color: white;
-    box-shadow: 0 10px 24px rgba(255, 92, 138, 0.35);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
   }
+  button:hover{ transform: translateY(-2px); background: var(--rose-deep); border-color: var(--rose-deep); }
+  button:active{ transform: translateY(0); }
 
-  button:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(255, 92, 138, 0.45); }
-  button:active { transform: translateY(0); }
-
-  button.ghost {
+  button.outline{
     background: transparent;
-    color: var(--rose-dark);
-    box-shadow: none;
-    border: 2px solid rgba(255, 92, 138, 0.35);
+    color: var(--ink);
+  }
+  button.outline:hover{ background: var(--ink); color: var(--paper); }
+
+  button.blue{
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+  button.blue:hover{ background: #23379e; border-color: #23379e; }
+
+  .btn-row{
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
   }
 
-  .btn-row {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
+  /* ---------- captcha grid ---------- */
+  .captcha-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
   }
-
-  .cat-row {
-    font-size: 2rem;
-    margin-bottom: 6px;
-  }
-
-  /* Photo match grid */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 8px;
-  }
-
-  .photo-card {
-    background: linear-gradient(135deg, #fff, #fff0f5);
-    border: 2px solid rgba(255, 92, 138, 0.2);
-    border-radius: 20px;
-    padding: 14px;
+  .tile{
+    aspect-ratio: 1/1;
+    border-radius: 10px;
+    border: 2px solid var(--line);
+    background: linear-gradient(160deg, #ffffff, #f6e9df);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 1.5rem;
     cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .photo-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 14px 26px rgba(255,92,138,0.25); }
-
-  .photo-frame {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #ffd6e6, #e6d6ff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.4rem;
-    margin-bottom: 10px;
+    position: relative;
     overflow: hidden;
+    transition: transform 0.12s ease, border-color 0.15s ease;
+  }
+  .tile img{ width:100%; height:100%; object-fit:cover; }
+  .tile:hover{ transform: translateY(-2px); }
+  .tile.selected{ border-color: var(--rose); box-shadow: inset 0 0 0 3px rgba(201,79,95,0.18); }
+  .tile.wrong{ border-color: #b23a3a; animation: shake 0.35s ease; }
+  .tile.correct-flash{ border-color: #4a8f5f; }
+
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-4px); }
+    75%{ transform: translateX(4px); }
   }
 
-  .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
-
-  .photo-label { font-weight: 700; font-size: 0.95rem; color: var(--rose-dark); }
-
-  /* Match reveal overlay */
-  #matchOverlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(61, 33, 69, 0.55);
-    z-index: 50;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+  .captcha-note{
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    margin: -6px 0 18px;
+    min-height: 18px;
   }
+  .captcha-note.error{ color: #b23a3a; font-weight: 600; }
+  .captcha-note.success{ color: #3d7a4d; font-weight: 600; }
 
-  #matchOverlay.active { display: flex; }
+  /* ---------- final gift scene: both buttons say Yes ---------- */
+  .yes-row{ display:flex; gap:14px; justify-content:center; }
 
-  .match-card {
-    background: var(--card);
-    border-radius: 26px;
-    padding: 38px 30px;
-    max-width: 420px;
+  /* ---------- video scene ---------- */
+  video{
     width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow);
-    animation: popIn 0.4s cubic-bezier(.2,1.4,.4,1);
-  }
-
-  @keyframes popIn {
-    from { transform: scale(0.7); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-
-  .match-photo {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin: 0 auto 18px;
-    background: linear-gradient(135deg, var(--rose), var(--gold));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.2rem;
-    overflow: hidden;
-    border: 5px solid #fff;
-    box-shadow: 0 10px 24px rgba(255,92,138,0.35);
-  }
-
-  .match-photo img { width: 100%; height: 100%; object-fit: cover; }
-
-  .match-percent {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--rose-dark);
-    margin: 6px 0 4px;
-  }
-
-  video {
-    width: 100%;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    border-radius: var(--radius-sm);
     background: #000;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+    margin-bottom: 16px;
+  }
+  .signoff{
+    font-family:'Caveat', cursive;
+    font-size: 1.5rem;
+    color: var(--rose-deep);
+    margin-top: 4px;
   }
 
-  .hint {
-    font-size: 0.8rem;
-    opacity: 0.55;
-    margin-top: 18px;
+  .hint{
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    opacity: 0.7;
+    margin-top: 16px;
   }
 
-  @media (max-width: 480px) {
-    h1.big-title { font-size: 2.3rem; }
-    .card { padding: 32px 20px; }
+  @media (max-width: 480px){
+    .card{ padding: 34px 24px; }
+    h1.lg{ font-size: 2.1rem; }
   }
 </style>
 </head>
 <body>
 
+<div id="watermark"></div>
 <canvas id="confetti-canvas"></canvas>
 <div id="floaters"></div>
 
 <div id="app">
 
-  <!-- SCENE 1: Welcome -->
-  <section class="scene active" data-scene="1">
+  <!-- SCENE: welcome / guess -->
+  <section class="scene active" data-scene="welcome">
     <div class="card">
-      <div class="eyebrow">Psst... come here</div>
-      <h1 class="title display">Welcome 💌</h1>
-      <p class="sub">Guess what day it is today...</p>
-      <input id="guessInput" type="text" placeholder="Type your guess here">
+      <div class="emblem">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#e8cf9c" stroke-width="2.2">
+          <circle cx="32" cy="38" r="20"/>
+          <path d="M14 24 L21 6 L28 22 Z"/>
+          <path d="M50 24 L43 6 L36 22 Z"/>
+          <circle cx="24" cy="36" r="1.8" fill="#e8cf9c"/>
+          <circle cx="40" cy="36" r="1.8" fill="#e8cf9c"/>
+          <path d="M20 48 L44 48"/>
+          <path d="M32 12 L25 6 L32 2 L39 6 Z"/>
+          <circle cx="32" cy="7" r="2" fill="#e8cf9c"/>
+        </svg>
+      </div>
+      <div class="eyebrow">A small formality</div>
+      <h1 class="md display">Before we begin —<br>what day is it today?</h1>
+      <p class="sub" style="margin-bottom:14px;">🎧 Please wear headphones for the full experience.</p>
+      <hr class="rule">
+      <input id="guessInput" type="text" placeholder="Your answer...">
       <div class="btn-row">
-        <button onclick="goToScene(2)">Submit my guess</button>
+        <button onclick="handleGuess()">Submit</button>
       </div>
     </div>
   </section>
 
-  <!-- SCENE 2: Birthday reveal -->
-  <section class="scene" data-scene="2">
+  <!-- SCENE: oops (only shown for a wrong guess) -->
+  <section class="scene" data-scene="oops">
     <div class="card">
-      <div class="cat-row">🐱🎀 &nbsp; 🐱🎀 &nbsp; 🐱🎀</div>
-      <h1 class="big-title display">IT'S YOUR BIRTHDAY!! 🎉</h1>
-      <p class="sub" id="birthdaySub">Yayyyyyy Happy Birthday My precious, Beautuiful, Smart Amazing Girlfriend</p>
+      <div class="eyebrow">Hmm</div>
+      <h1 class="md display">Oops — I think you forgot it's your birthday.</h1>
+      <p class="sub">Easy mistake. Let's fix that.</p>
       <div class="btn-row">
-        <button onclick="goToScene(3)">Okay okay, what's next?</button>
+        <button onclick="showBirthday('Turns out it was your birthday all along.')">Wait, really?</button>
       </div>
     </div>
   </section>
 
-  <!-- SCENE 3: Gift teaser -->
-  <section class="scene" data-scene="3">
+  <!-- SCENE: birthday reveal -->
+  <section class="scene" data-scene="birthday">
     <div class="card">
-      <div class="eyebrow">One more thing</div>
-      <h1 class="title display">Do you want to know your gift? 🎁</h1>
-      <p class="sub">Choose wisely.</p>
+      <div class="eyebrow">Confirmed</div>
+      <h1 class="lg display">Happy Birthday.</h1>
+      <p class="sub" id="birthdayLine">It's officially, unquestionably, all about you today.</p>
       <div class="btn-row">
-        <button onclick="goToScene(4)">Yes</button>
-        <button class="ghost" onclick="goToScene(4)">No</button>
+        <button onclick="goToScene('giftIntro')">What's next?</button>
       </div>
     </div>
   </section>
 
-  <!-- SCENE 4: Find your boyfriend -->
-  <section class="scene" data-scene="4">
+  <!-- SCENE: gift intro question -->
+  <section class="scene" data-scene="giftIntro">
     <div class="card">
-      <div class="eyebrow">Match Time</div>
-      <h1 class="title display">Find your boyfriend 🔎💕</h1>
-      <p class="sub">Tap any photo below.</p>
-      <div class="grid" id="photoGrid"></div>
-      <p class="hint">(spoiler: they're all correct)</p>
+      <div class="eyebrow">One moment</div>
+      <h1 class="md display">Do you want to know your gift?</h1>
+      <p class="sub">Choose carefully.</p>
+      <div class="btn-row">
+        <button onclick="goToScene('captcha')">Yes</button>
+        <button class="blue" onclick="goToScene('captcha')">YESSS</button>
+      </div>
     </div>
   </section>
 
-  <!-- SCENE 5: Video -->
-  <section class="scene" data-scene="5">
+  <!-- SCENE: captcha / find your boyfriend -->
+  <section class="scene" data-scene="captcha">
     <div class="card">
-      <div class="eyebrow">Last surprise</div>
-      <h1 class="title display">This one's for you 🎬</h1>
-      <p class="sub">Happy birthday, my love.</p>
+      <div class="eyebrow">Quick verification</div>
+      <h1 class="md display">Find your boyfriend</h1>
+      <p class="sub">Select the 3 correct photos to continue.</p>
+      <div class="captcha-grid" id="captchaGrid"></div>
+      <div class="captcha-note" id="captchaNote">&nbsp;</div>
+      <div class="btn-row">
+        <button onclick="verifyCaptcha()">Verify</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: final gift question — both options are Yes -->
+  <section class="scene" data-scene="finalGift">
+    <div class="card">
+      <div class="eyebrow">Last question</div>
+      <h1 class="md display">Do you want your final gift?</h1>
+      <p class="sub">Pick an option.</p>
+      <div class="yes-row">
+        <button onclick="goToScene('video')">Yes</button>
+        <button class="blue" onclick="goToScene('video')">Yes</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE: video -->
+  <section class="scene" data-scene="video">
+    <div class="card">
+      <div class="eyebrow">For you</div>
+      <h1 class="md display">Happy Birthday, my love.</h1>
       <video id="birthdayVideo" controls playsinline>
         <source src="video.mp4" type="video/mp4">
         Your browser doesn't support video playback.
       </video>
+      <div class="signoff">— always yours</div>
     </div>
   </section>
 
 </div>
 
-<!-- Match overlay -->
-<div id="matchOverlay">
-  <div class="match-card">
-    <div class="match-photo" id="matchPhoto">💘</div>
-    <div class="match-percent">100% Match!</div>
-    <div id="matchName" style="font-weight:700; font-size:1.2rem; margin-bottom:18px;"></div>
-    <button onclick="closeMatch()">See my surprise ➜</button>
-  </div>
-</div>
+<audio id="backgroundSong" preload="auto" loop>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-  // ============================================================
-  // CONFIG — edit this section to personalize everything
-  // ============================================================
+  // ================================================================
+  // CONFIG — edit everything here to personalize the page
+  // ================================================================
   const CONFIG = {
-    boyfriendName: "Your Boyfriend",     // shown on the match reveal
-    // Photo grid: put your own image filenames here (same folder as this html).
-    // Leave as emoji placeholders if you don't have files ready yet.
-    photoOptions: [
-      { label: "Option A", img: "" },
-      { label: "Option B", img: "" },
-      { label: "Option C", img: "" },
-      { label: "Option D", img: "" }
+    // 9 photos for the "find your boyfriend" verification.
+    // Mark exactly 3 as correct:true (photos of him). The other 6
+    // are decoys — anything else (friends, strangers, objects, etc).
+    // Leave img:"" to show a camera placeholder until you add files.
+    captchaPhotos: [
+      { img: "", correct: false },
+      { img: "", correct: true  },
+      { img: "", correct: false },
+      { img: "", correct: false },
+      { img: "", correct: true  },
+      { img: "", correct: false },
+      { img: "", correct: true  },
+      { img: "", correct: false },
+      { img: "", correct: false }
     ],
-    boyfriendPhoto: "",   // e.g. "me.jpg" — shown in the match circle
-    videoSrc: "video.mp4" // your uploaded video file, same folder as this html
+    videoSrc: "video.mp4", // your video file, placed next to this html file
+    songSrc: "song.mp3"    // the song to play the moment it's revealed to be her birthday
   };
 
-  // Wire up video source from config
   document.getElementById('birthdayVideo').querySelector('source').src = CONFIG.videoSrc;
+  document.getElementById('backgroundSong').querySelector('source').src = CONFIG.songSrc;
 
-  // Build the photo grid
-  const grid = document.getElementById('photoGrid');
-  CONFIG.photoOptions.forEach((opt) => {
-    const card = document.createElement('div');
-    card.className = 'photo-card';
-    card.innerHTML = `
-      <div class="photo-frame">${opt.img ? `<img src="${opt.img}" alt="${opt.label}">` : '📷'}</div>
-      <div class="photo-label">${opt.label}</div>
-    `;
-    card.onclick = showMatch;
-    grid.appendChild(card);
+  // ================================================================
+  // Scene 1 logic: guess the day
+  // ================================================================
+  function handleGuess(){
+    const raw = document.getElementById('guessInput').value || '';
+    const normalized = raw.toLowerCase().replace(/[^a-z]/g, '');
+    const isCorrect = /birthday/.test(normalized) || /bday/.test(normalized);
+
+    if (isCorrect){
+      showBirthday("You got it right — it's your birthday!");
+    } else {
+      goToScene('oops');
+    }
+  }
+
+  function showBirthday(message){
+    document.getElementById('birthdayLine').textContent = message;
+    goToScene('birthday');
+    burstConfetti(130);
+    const song = document.getElementById('backgroundSong');
+    song.currentTime = 0;
+    song.play().catch(() => {});
+  }
+
+  document.getElementById('guessInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleGuess();
   });
 
-  function showMatch() {
-    const photoEl = document.getElementById('matchPhoto');
-    photoEl.innerHTML = CONFIG.boyfriendPhoto
-      ? `<img src="${CONFIG.boyfriendPhoto}" alt="${CONFIG.boyfriendName}">`
-      : '💘';
-    document.getElementById('matchName').textContent = `It's ${CONFIG.boyfriendName}!`;
-    document.getElementById('matchOverlay').classList.add('active');
-    burstConfetti(60);
-  }
+  // ================================================================
+  // Captcha grid
+  // ================================================================
+  const grid = document.getElementById('captchaGrid');
+  let selected = new Set();
 
-  function closeMatch() {
-    document.getElementById('matchOverlay').classList.remove('active');
-    goToScene(5);
-  }
+  CONFIG.captchaPhotos.forEach((photo, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.index = i;
+    tile.innerHTML = photo.img ? `<img src="${photo.img}" alt="Option ${i+1}">` : '📷';
+    tile.onclick = () => toggleTile(i, tile);
+    grid.appendChild(tile);
+  });
 
-  // ============================================================
-  // Scene navigation
-  // ============================================================
-  function goToScene(n) {
-    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-    document.querySelector(`.scene[data-scene="${n}"]`).classList.add('active');
-
-    if (n === 2) {
-      burstConfetti(140);
-      startFloaters();
+  function toggleTile(i, el){
+    if (selected.has(i)){
+      selected.delete(i);
+      el.classList.remove('selected');
+    } else {
+      selected.add(i);
+      el.classList.add('selected');
     }
-    if (n === 5) {
+    setCaptchaNote('');
+  }
+
+  function setCaptchaNote(text, type){
+    const note = document.getElementById('captchaNote');
+    note.textContent = text || '\u00A0';
+    note.className = 'captcha-note' + (type ? ' ' + type : '');
+  }
+
+  function verifyCaptcha(){
+    const correctSet = new Set(
+      CONFIG.captchaPhotos.map((p, i) => p.correct ? i : null).filter(v => v !== null)
+    );
+
+    if (selected.size !== 3){
+      setCaptchaNote('Select exactly 3 photos.', 'error');
+      return;
+    }
+
+    const isMatch = [...selected].every(i => correctSet.has(i)) && selected.size === correctSet.size;
+
+    if (isMatch){
+      setCaptchaNote('Hooray — you found your boyfriend!', 'success');
+      [...grid.children].forEach((tile, i) => {
+        if (selected.has(i)) tile.classList.add('correct-flash');
+      });
+      burstConfetti(90);
+      floaterBurst(6);
+      setTimeout(() => goToScene('finalGift'), 1300);
+    } else {
+      setCaptchaNote('Not quite — try again.', 'error');
+      [...grid.children].forEach((tile, i) => {
+        if (selected.has(i) && !correctSet.has(i)) tile.classList.add('wrong');
+      });
+      setTimeout(() => {
+        selected.clear();
+        [...grid.children].forEach(tile => tile.classList.remove('selected','wrong'));
+      }, 700);
+    }
+  }
+
+  // ================================================================
+  // Scene navigation
+  // ================================================================
+  function goToScene(name){
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.querySelector(`.scene[data-scene="${name}"]`).classList.add('active');
+
+    if (name === 'birthday'){
+      startFloaters();
+    } else {
       stopFloaters();
+    }
+
+    if (name === 'video'){
+      document.getElementById('backgroundSong').pause();
       const v = document.getElementById('birthdayVideo');
       v.currentTime = 0;
-      v.play().catch(() => {}); // autoplay may be blocked until user interacts, that's fine
+      v.play().catch(() => {});
     }
   }
 
-  // ============================================================
-  // Confetti (lightweight canvas particle system)
-  // ============================================================
+  // ================================================================
+  // Floating balloons + bow-cats — big, playful, ambient during the
+  // birthday reveal and as a burst when she finds her boyfriend
+  // ================================================================
+  const floatersEl = document.getElementById('floaters');
+  let floaterTimer = null;
+
+  const catSVG = `<svg viewBox="0 0 64 64" fill="none" stroke="#e8cf9c" stroke-width="2.4">
+      <circle cx="32" cy="38" r="20"/>
+      <path d="M14 24 L21 6 L28 22 Z"/>
+      <path d="M50 24 L43 6 L36 22 Z"/>
+      <circle cx="24" cy="36" r="1.8" fill="#e8cf9c"/>
+      <circle cx="40" cy="36" r="1.8" fill="#e8cf9c"/>
+      <path d="M20 48 L44 48"/>
+      <path d="M32 12 L25 6 L32 2 L39 6 Z" fill="#c94f5f" stroke="#c94f5f"/>
+      <circle cx="32" cy="7" r="2" fill="#fff6ee"/>
+    </svg>`;
+
+  const balloonEmojis = ['🎈', '🎈', '🎈'];
+
+  function spawnFloater(){
+    const el = document.createElement('div');
+    const useCat = Math.random() < 0.4;
+    el.className = 'floater ' + (useCat ? 'svg' : 'emoji');
+    el.innerHTML = useCat ? catSVG : balloonEmojis[Math.floor(Math.random() * balloonEmojis.length)];
+    el.style.left = (5 + Math.random() * 85) + 'vw';
+    const duration = 3.4 + Math.random() * 2.2;
+    el.style.animationDuration = duration + 's';
+    if (!useCat) el.style.fontSize = (2.4 + Math.random() * 1.8) + 'rem';
+    floatersEl.appendChild(el);
+    setTimeout(() => el.remove(), duration * 1000 + 300);
+  }
+
+  function startFloaters(){
+    if (floaterTimer) return;
+    for (let i = 0; i < 3; i++) setTimeout(spawnFloater, i * 120);
+    floaterTimer = setInterval(spawnFloater, 260);
+  }
+
+  function stopFloaters(){
+    if (floaterTimer){ clearInterval(floaterTimer); floaterTimer = null; }
+  }
+
+  function floaterBurst(count){
+    for (let i = 0; i < count; i++) setTimeout(spawnFloater, i * 120);
+  }
+
+  // ================================================================
+  // Confetti — restrained palette, single orchestrated bursts only
+  // ================================================================
   const canvas = document.getElementById('confetti-canvas');
   const ctx = canvas.getContext('2d');
-  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
+  const palette = ['#c94f5f', '#c99a4b', '#fff6ee', '#e8cf9c'];
   let particles = [];
-  const confettiColors = ['#ff5c8a', '#ffc857', '#8fe3c0', '#e6d6ff', '#ff9fc0'];
+  let animating = false;
 
-  function burstConfetti(count) {
-    for (let i = 0; i < count; i++) {
+  function burstConfetti(count){
+    for (let i = 0; i < count; i++){
+      const isRibbon = Math.random() < 0.35;
       particles.push({
-        x: Math.random() * canvas.width,
-        y: -20 - Math.random() * 200,
-        w: 6 + Math.random() * 6,
-        h: 8 + Math.random() * 10,
-        color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-        vy: 2 + Math.random() * 3,
-        vx: -1.5 + Math.random() * 3,
+        x: canvas.width / 2 + (Math.random() - 0.5) * 260,
+        y: canvas.height * 0.32,
+        w: isRibbon ? 6 + Math.random() * 4 : 12 + Math.random() * 10,
+        h: isRibbon ? 22 + Math.random() * 16 : 14 + Math.random() * 10,
+        color: palette[Math.floor(Math.random() * palette.length)],
+        vy: -9 - Math.random() * 5,
+        vx: (Math.random() - 0.5) * 9,
+        gravity: 0.22,
         rot: Math.random() * 360,
-        vr: -6 + Math.random() * 12,
+        vr: (Math.random() - 0.5) * 14,
         life: 0
       });
     }
-    if (!animating) { animating = true; requestAnimationFrame(tick); }
+    if (!animating){ animating = true; requestAnimationFrame(tick); }
   }
 
-  let animating = false;
-  function tick() {
+  function tick(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach(p => {
+      p.vy += p.gravity;
       p.x += p.vx;
       p.y += p.vy;
       p.rot += p.vr;
@@ -497,47 +627,17 @@
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot * Math.PI / 180);
       ctx.fillStyle = p.color;
-      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
       ctx.restore();
     });
-    particles = particles.filter(p => p.y < canvas.height + 40 && p.life < 500);
-    if (particles.length > 0) {
+    particles = particles.filter(p => p.y < canvas.height + 40 && p.life < 260);
+    if (particles.length > 0){
       requestAnimationFrame(tick);
     } else {
       animating = false;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
   }
-
-  // ============================================================
-  // Floating cats-with-bows + hearts + balloons ambience
-  // ============================================================
-  const floaterEmojis = ['🐱🎀', '🎈', '💗', '🐈‍⬛🎀', '✨', '🎂'];
-  let floaterInterval = null;
-
-  function startFloaters() {
-    if (floaterInterval) return;
-    floaterInterval = setInterval(() => {
-      const el = document.createElement('div');
-      el.className = 'floater';
-      el.textContent = floaterEmojis[Math.floor(Math.random() * floaterEmojis.length)];
-      el.style.left = Math.random() * 90 + 'vw';
-      const duration = 6 + Math.random() * 5;
-      el.style.animationDuration = duration + 's';
-      el.style.fontSize = (1.6 + Math.random() * 1.6) + 'rem';
-      document.getElementById('floaters').appendChild(el);
-      setTimeout(() => el.remove(), duration * 1000 + 200);
-    }, 350);
-  }
-
-  function stopFloaters() {
-    if (floaterInterval) { clearInterval(floaterInterval); floaterInterval = null; }
-  }
-
-  // Allow Enter key to submit the guess
-  document.getElementById('guessInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') goToScene(2);
-  });
 </script>
 
 </body>
